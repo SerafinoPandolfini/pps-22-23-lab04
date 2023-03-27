@@ -1,18 +1,20 @@
 package u04lab.code
 import List.*
-trait Item {
+trait Item :
   def code: Int
   def name: String
   def tags: List[String]
-}
+
 
 object Item:
-  def apply(code: Int, name: String, tags: List[String] = List.empty): Item = ???
+  def apply(code: Int, name: String, tags: List[String] = List.empty): Item = ItemImpl(code, name, tags)
+  private case class ItemImpl(override val code: Int, override val name: String,
+                              override val tags: List[String] = List.empty) extends Item
 
 /**
  * A warehouse is a place where items are stored.
  */
-trait Warehouse {
+trait Warehouse :
   /**
    * Stores an item in the warehouse.
    * @param item the item to store
@@ -41,11 +43,21 @@ trait Warehouse {
    * @return true if the warehouse contains an item with the given code, false otherwise
    */
   def contains(itemCode: Int): Boolean
-}
 
-object Warehouse {
-  def apply(): Warehouse = ???
-}
+
+object Warehouse :
+  def apply(): Warehouse = WarehouseImpl()
+
+  private class WarehouseImpl() extends Warehouse:
+
+    private val list: List[Item] = Nil()
+    override def store(item: Item): Unit = append(list, Cons(item, Nil()))
+    override def searchItems(tag: String): List[Item] = filter(list)(i => List.contains(i.tags, tag))
+    override def retrieve(code: Int): Option[Item] = find(list)(i => i.code == code)
+    override def remove(item: Item): Unit = filter(list)(i => i.code != item.code)
+    override def contains(itemCode: Int): Boolean = List.contains(map(list)(i => i.code), itemCode)
+
+
 
 @main def mainWarehouse(): Unit =
   val warehouse = Warehouse()
